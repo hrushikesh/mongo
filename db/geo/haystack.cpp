@@ -275,18 +275,28 @@ namespace mongo {
                 return false;
             }
 
-            vector<int> idxs;
-            d->findIndexByType( GEOSEARCHNAME , idxs );
-            if ( idxs.size() == 0 ) {
-                errmsg = "no geoSearch index";
-                return false;
+            int idxNum = 0;
+            if( mongo::String == cmdObj["indexName"].type() ) {
+                string indexName = cmdObj["indexName"].String();
+                idxNum = d->findIndexByName( indexName.c_str() );
+                if ( -1 == idxNum ) {
+                    errmsg = "no index of specified name found";
+                    return false;
+                }
             }
-            if ( idxs.size() > 1 ) {
-                errmsg = "more than 1 geosearch index";
-                return false;
+            else {
+                vector<int> idxs;
+                d->findIndexByType( GEOSEARCHNAME , idxs );
+                if ( idxs.size() == 0 ) {
+                    errmsg = "no geoSearch index";
+                    return false;
+                }
+                if ( idxs.size() > 1 ) {
+                    errmsg = "more than 1 geosearch index";
+                    return false;
+                }
+                idxNum = idxs[0];
             }
-
-            int idxNum = idxs[0];
 
             IndexDetails& id = d->idx( idxNum );
             GeoHaystackSearchIndex * si = (GeoHaystackSearchIndex*)id.getSpec().getType();
