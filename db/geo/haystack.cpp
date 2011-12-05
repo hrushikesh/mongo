@@ -276,7 +276,7 @@ namespace mongo {
             }
 
             int idxNum = 0;
-            if( mongo::String == cmdObj["indexName"].type() ) {
+            if( Object == cmdObj["indexName"].type() ) {
                 string indexName = cmdObj["indexName"].String();
                 idxNum = d->findIndexByName( indexName.c_str() );
                 if ( -1 == idxNum ) {
